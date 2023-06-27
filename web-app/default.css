@@ -1,0 +1,76 @@
+/* CSS Styles */
+
+/* Set height and reset margin and padding for HTML and body */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+}
+
+/* Set body to flex container with column direction and center alignment */
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Styling for the title bar */
+.title-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000;
+    text-align: center;
+    font-family: "puffin-arcade-nerf", sans-serif;
+    font-weight: 800;
+    font-style: normal;
+    font-size: 46px;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    text-shadow: 0 0 5px #fff, 0 0 30px #40a7e5, 0 0 40px #40a7e5, 0 0 50px #40a7e5, 0 0 60px #40a7e5, 0 0 70px #40a7e5;
+    padding-top: 5px;
+}
+
+/* Styling for the title bar image */
+.title-bar img {
+    width: 250px;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 20px;
+}
+
+/* Styling for the timer element */
+.timer {
+    align-self: center;
+    margin-right: 30px;
+}
+
+/* Styling for the title element */
+.title {
+    align-self: center;
+    margin-left: 30px;
+}
+
+/* Styling for the score element */
+.score {
+    position: absolute;
+    align-self: center;
+    width: 100%;
+    text-align: center;
+}
+
+/* Styling for the screen element */
+#screen {
+    margin-top: 80px;
+}
+
+/* Styling for the API documentation link */
+a {
+    color: #ffffff;
+    text-decoration: underline;
+    font-family: "Helvetica", Arial, sans-serif;
+}

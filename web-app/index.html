@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Speedy Shots</title>
+    <link rel="stylesheet" href="./default.css">
+    <link rel="stylesheet" href="https://use.typekit.net/txf3nyh.css">
+</head>
+
+<body>
+    <!-- Game UI -->
+    <div class="title-bar">
+        <div id="title" class="title">SPEEDY SHOTS</div>
+        <div id="score" class="score">Score: 0</div>
+        <div id="timer" class="timer">60</div> <!-- Separate timer -->
+    </div>
+
+    <!-- Game canvas -->
+    <canvas id="screen" width="1500" height="825"></canvas>
+
+    <!-- Game audio -->
+    <audio id="strike" preload="auto" src="assets/Strike.wav"></audio>
+    <audio id="strike2" preload="auto" src="assets/Strike.wav"></audio>
+    <audio id="pot" preload="auto" src="assets/Pot.wav"></audio>
+
+    <!-- Game scripts -->
+    <script src="Input.js"></script> <!-- Handles input events -->
+    <script src="Canvas.js"></script> <!-- Provides canvas drawing functions -->
+    <script type="module" src="GameLogic.js"></script> <!-- Contains game world logic -->
+    <script type="module" src="Assets.js"></script> <!-- Loads game assets -->
+    <script type="module" src="Ball.js"></script> <!-- Ball class definition -->
+    <script type="module" src="Cue.js"></script> <!-- Stick class definition -->
+    <script type="module" src="main.js"></script>
+
+    <!-- API Documentation Link -->
+    <a href="../out/SpeedyShots.GameLogic.html">API Documentation</a>
+</body>
+
+</html>

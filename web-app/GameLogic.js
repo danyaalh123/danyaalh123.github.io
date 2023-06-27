@@ -1,0 +1,302 @@
+import Ball from "./Ball.js";
+import AssetLoader from "./Assets.js";
+import Cue from "./Cue.js";
+
+/**
+ * Speedy Shots game logic module.
+ * @namespace SpeedyShots
+ */
+
+/**
+ * Time delta for update calculations.
+ * @type {number}
+ * @constant
+ * @default
+ */
+const DELTA = 1 / 150;
+
+/**
+ * Represents the game logic of Speedy Shots.
+ * @memberof SpeedyShots
+ * @constructor
+ */
+function GameLogic() {
+    /**
+     * The black ball object.
+     * @type {Ball}
+     */
+    this.blackBall = new Ball({ x: 1090, y: 413 }, AssetLoader.objects.blackBall, 0);
+
+    /**
+     * The white ball object.
+     * @type {Ball}
+     */
+    this.whiteBall = new Ball({ x: 413, y: 413 }, AssetLoader.objects.whiteBall, 1);
+
+    /**
+     * The cue object.
+     * @type {Cue}
+     */
+    this.cue = new Cue({ x: 413, y: 413 }, this.whiteBall.shoot.bind(this.whiteBall));
+
+    /**
+     * The table properties.
+     * @type {object}
+     */
+    this.table = {
+        TopY: 57,
+        RightX: 1443,
+        BottomY: 768,
+        LeftX: 57
+    };
+
+    /**
+     * The timer element.
+     * @type {HTMLElement}
+     */
+    this.timerElement = document.getElementById("timer");
+
+    /**
+     * The score value.
+     * @type {number}
+     */
+    this.score = 0;
+
+    /**
+     * The score element.
+     * @type {HTMLElement}
+     */
+    this.scoreElement = document.getElementById("score");
+
+    /**
+     * Flag indicating if the break shot has occurred.
+     * @type {boolean}
+     */
+    this.break = false;
+
+    /**
+     * Flag indicating if the score is changing.
+     * @type {boolean}
+     */
+    this.scored = false;
+}
+
+/**
+ * Handles collisions between balls and the table.
+ * @memberof SpeedyShots.GameLogic
+ */
+GameLogic.prototype.handleCollisions = function () {
+    // Handle collisions between balls and table
+    this.whiteBall.collideWithTable(this.table);
+    this.blackBall.collideWithTable(this.table);
+    this.whiteBall.collideWithBall(this.blackBall);
+};
+
+/**
+ * Updates the game logic.
+ * @memberof SpeedyShots.GameLogic
+ */
+GameLogic.prototype.update = function () {
+    this.handleCollisions();
+    this.cue.update();
+    this.whiteBall.update(DELTA);
+    this.blackBall.update(DELTA);
+
+    if (this.whiteBall.potted) {
+        this.whiteBall.hide();
+        if (!this.ballsMoving()) {
+            this.whiteBall.reposition({ x: 413, y: 413 });
+            this.subtractFromTimer();
+        }
+    }
+
+    if (this.blackBall.potted) {
+        if (!this.scored) {
+            this.updateScore(1);
+            this.scored = true;
+        }
+        this.blackBall.hide();
+        if (!this.ballsMoving()) {
+            const randomX = Math.floor(Math.random() * (this.table.RightX - this.table.LeftX)) + this.table.LeftX;
+            const randomY = Math.floor(Math.random() * (this.table.BottomY - this.table.TopY)) + this.table.TopY;
+            this.blackBall.reposition({ x: randomX, y: randomY });
+            this.scored = false;
+        }
+    }
+
+    if (this.cue.shot) {
+        if (!this.break) {
+            this.startTimer();
+
+
+        }
+        this.break = true;
+        if (!this.ballsMoving()) {
+            if (this.whiteBall.collided) {
+                this.whiteBall.collided = false;
+            } else {
+                this.subtractFromTimer();
+            }
+            this.cue.reposition(this.whiteBall.position);
+        }
+    }
+};
+
+/**
+ * Draws the game logic.
+ * @memberof SpeedyShots.GameLogic
+ */
+GameLogic.prototype.draw = function () {
+    Canvas.drawImage(AssetLoader.objects.background, { x: 0, y: 0 });
+    this.cue.draw();
+    this.whiteBall.draw();
+    this.blackBall.draw();
+};
+
+/**
+ * Checks if any balls are still moving.
+ * @memberof SpeedyShots.GameLogic
+ * @returns {boolean} True if any balls are moving, false otherwise.
+ */
+GameLogic.prototype.ballsMoving = function () {
+    return this.whiteBall.moving || this.blackBall.moving;
+};
+
+/**
+ * Starts the game timer.
+ * @memberof SpeedyShots.GameLogic
+ */
+GameLogic.prototype.startTimer = function () {
+    this.countdown = 60;
+
+    const timer = setInterval(() => {
+        this.countdown--;
+        this.timerElement.textContent = this.countdown;
+        if (this.countdown <= 10) {
+            this.timerElement.style.color = "red";
+        }
+        if (this.countdown <= 0) {
+            clearInterval(timer);
+            alert("Final Score: " + this.score);
+            this.countdown = 0;
+            this.score = 0;
+            this.scoreElement.textContent = "Score: " + this.score;
+            this.break = false;
+            this.timerElement.style.color = "#fff";
+            this.whiteBall.reposition({ x: 413, y: 413 });
+            this.blackBall.reposition({ x: 1090, y: 413 });
+            this.cue.reposition(this.whiteBall.position);
+            this.timerElement.textContent = 60;
+        }
+    }, 1000);
+};
+
+/**
+ * Updates the game score and applies visual effect.
+ * @memberof SpeedyShots.GameLogic
+ * @param {number} value - The value to update the score by.
+ */
+GameLogic.prototype.updateScore = function (value) {
+    this.score += value;
+    this.scoreElement.textContent = "Score: " + this.score;
+
+    // The time interval for flash in milliseconds
+    const flashInterval = 200;
+
+    let isBlue = true;
+
+    // Start flashing
+    const flash = setInterval(() => {
+        this.scoreElement.style.color = isBlue ? "#40a7e5" : "#fff";
+        isBlue = !isBlue;
+    }, flashInterval);
+
+    // Stop flashing after 2 seconds
+    setTimeout(() => {
+        clearInterval(flash);
+        // Set the color back to white when the flashing stops
+        this.scoreElement.style.color = "#fff";
+    }, 2000);
+};
+
+/**
+ * Subtracts from the game timer and applies visual effect.
+ * @memberof SpeedyShots.GameLogic
+ */
+GameLogic.prototype.subtractFromTimer = function () {
+    this.countdown -= 3;
+
+    // The time interval for flash in milliseconds
+    const flashInterval = 200;
+
+    let isRed = true;
+
+    // Start flashing
+    const flash = setInterval(() => {
+        this.timerElement.style.color = isRed ? "red" : "#fff";
+        isRed = !isRed;
+    }, flashInterval);
+
+    // Stop flashing after 2 seconds
+    setTimeout(() => {
+        clearInterval(flash);
+        // Set the color back to white when the flashing stops
+        this.timerElement.style.color = "#fff";
+    }, 2000);
+};
+
+/**
+ * Speedy Shots game module.
+ * @memberof Speedy
+
+Shots
+ * @constructor
+ */
+function Game() { }
+
+/**
+ * Initializes the game.
+ * @memberof SpeedyShots.Game
+ */
+Game.prototype.init = function () {
+    this.gameLogic = new GameLogic();
+};
+
+/**
+ * Starts the game.
+ * @memberof SpeedyShots.Game
+ */
+Game.prototype.start = function () {
+    SpeedyShots.init();
+    SpeedyShots.mainLoop();
+};
+
+/**
+ * The main game loop.
+ * @memberof SpeedyShots.Game
+ */
+Game.prototype.mainLoop = function () {
+    Canvas.clear();
+    SpeedyShots.gameLogic.update();
+    SpeedyShots.gameLogic.draw();
+    Mouse.reset();
+
+    requestAnimationFrame(SpeedyShots.mainLoop);
+};
+
+/**
+ * The Speedy Shots game instance.
+ * @type {Game}
+ */
+let SpeedyShots = new Game();
+
+/**
+ * Function to test if mocha tests are working correctly.
+ * @memberof SpeedyShots
+ * @returns {string} The test result.
+ */
+SpeedyShots.testMocha = function () {
+    return 'mocha';
+};
+
+export default SpeedyShots;

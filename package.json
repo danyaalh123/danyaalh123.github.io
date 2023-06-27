@@ -1,0 +1,21 @@
+{
+  "name": "computing-2-submission",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/uu0DCd-8)\r # Computing 2 Coursework Submission.\r **CID**: [02100452]",
+  "main": "index.html",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "DANYAL-HUSSAIN",
+  "license": "ISC",
+  "devDependencies": {
+    "docdash": "^1.2.0",
+    "request": "^2.88.2",
+    "mocha": "^9.2.2"
+  },
+  "dependencies": {
+    "ramda": "^0.29.0",
+    "jsdom": "^16.6.0"
+  }
+}
